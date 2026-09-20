@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ChainVote - Voter Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 2rem;
+        }
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .sidebar a {
+            padding: 1rem;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.05);
+            transition: all 0.3s;
+            border: 1px solid transparent;
+        }
+        .sidebar a:hover, .sidebar a.active {
+            background: rgba(0, 229, 255, 0.1);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        .stat-card {
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 1rem 0;
+        }
+        .status-dot {
+            height: 12px;
+            width: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+        .status-live { background-color: var(--success); box-shadow: 0 0 10px var(--success); }
+        .status-closed { background-color: var(--danger); box-shadow: 0 0 10px var(--danger); }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="logo">
+            <span class="logo-icon">⬡</span> CHAINVOTE
+        </div>
+        <div class="nav-links">
+            <span style="color: var(--text-muted)">Voter: <span id="userNameDisplay" style="color:white;"></span></span>
+            <a href="#" onclick="logout()" class="btn btn-outline" style="padding: 0.5rem 1rem;">Logout</a>
+        </div>
+    </nav>
+
+    <div class="container dashboard-grid fade-in">
+        <div class="sidebar glass-panel">
+            <a href="dashboard.html" class="active">Dashboard</a>
+            <a href="vote.html">Cast Vote</a>
+            <a href="candidates.html">Candidates</a>
+            <a href="blockchain.html">Blockchain Verification</a>
+        </div>
+        
+        <div class="main-content">
+            <h2 style="margin-bottom: 2rem;">Voter Overview</h2>
+            
+            <div class="grid" style="grid-template-columns: repeat(3, 1fr);">
+                <div class="glass-panel stat-card">
+                    <div style="color: var(--text-muted)">Election Status</div>
+                    <div class="stat-value" id="elStatusVal" style="font-size: 1.5rem; margin-top: 1.5rem;">
+                        <span class="status-dot" id="elStatusDot"></span> <span id="elStatusText">Loading</span>
+                    </div>
+                </div>
+                
+                <div class="glass-panel stat-card">
+                    <div style="color: var(--text-muted)">Your Voting Status</div>
+                    <div class="stat-value" id="voteStatus" style="font-size: 1.2rem; margin-top: 1.8rem; color: var(--success);">
+                        Pending
+                    </div>
+                </div>
+                
+                <div class="glass-panel stat-card">
+                    <div style="color: var(--text-muted)">Network Blocks</div>
+                    <div class="stat-value" id="blockCount">0</div>
+                </div>
+            </div>
+
+            <div class="glass-panel" style="margin-top: 2rem;">
+                <h3 style="margin-bottom: 1rem; color: var(--primary);">Important Information</h3>
+                <p class="subtitle" style="margin-bottom: 1rem;">Welcome to the secure digital voting system. Your identity is authenticated and verified.</p>
+                <p class="subtitle" style="margin-bottom: 1rem;">Please proceed to the "Cast Vote" section when you are ready. Once submitted, your vote is cryptographically signed and permanently added to the blockchain, ensuring it cannot be altered or deleted.</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        const user = checkAuth('VOTER');
+        if (user) {
+            document.getElementById('userNameDisplay').textContent = user.name + " (" + user.id + ")";
+            
+            const isLive = isElectionLive();
+            const dot = document.getElementById('elStatusDot');
+            const txt = document.getElementById('elStatusText');
+            if (isLive) {
+                dot.className = 'status-dot status-live';
+                txt.textContent = 'LIVE';
+            } else {
+                dot.className = 'status-dot status-closed';
+                txt.textContent = 'CLOSED';
+                txt.style.color = 'var(--danger)';
+            }
+
+            const voteStatus = document.getElementById('voteStatus');
+            if (user.hasVoted) {
+                voteStatus.textContent = '✓ VOTE CAST';
+                voteStatus.style.color = 'var(--success)';
+            } else {
+                voteStatus.textContent = 'PENDING';
+                voteStatus.style.color = 'var(--text-main)';
+            }
+            
+            const chain = JSON.parse(localStorage.getItem('blockchain'));
+            document.getElementById('blockCount').textContent = chain.length;
+        }
+    </script>
+</body>
+</html>

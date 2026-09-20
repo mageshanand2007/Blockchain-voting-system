@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ChainVote - Cast Vote</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 2rem;
+        }
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .sidebar a {
+            padding: 1rem;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.05);
+            transition: all 0.3s;
+            border: 1px solid transparent;
+        }
+        .sidebar a:hover, .sidebar a.active {
+            background: rgba(0, 229, 255, 0.1);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        .candidate-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        .candidate-card:hover, .candidate-card.selected {
+            border-color: var(--primary);
+            box-shadow: 0 0 20px rgba(0, 229, 255, 0.15);
+            background: rgba(0, 229, 255, 0.05);
+        }
+        .candidate-symbol {
+            font-size: 2.5rem;
+            margin-right: 1.5rem;
+        }
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: var(--bg-main);
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+        }
+        .success-animation {
+            font-size: 4rem;
+            color: var(--success);
+            margin-bottom: 1rem;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="logo">
+            <span class="logo-icon">⬡</span> CHAINVOTE
+        </div>
+        <div class="nav-links">
+            <span style="color: var(--text-muted)">Voter: <span id="userNameDisplay" style="color:white;"></span></span>
+            <a href="#" onclick="logout()" class="btn btn-outline" style="padding: 0.5rem 1rem;">Logout</a>
+        </div>
+    </nav>
+
+    <div class="container dashboard-grid fade-in">
+        <div class="sidebar glass-panel">
+            <a href="dashboard.html">Dashboard</a>
+            <a href="vote.html" class="active">Cast Vote</a>
+            <a href="candidates.html">Candidates</a>
+            <a href="blockchain.html">Blockchain Verification</a>
+        </div>
+        
+        <div class="main-content">
+            <h2 style="margin-bottom: 1rem;">Secure Voting Terminal</h2>
+            <div id="votingWarning" class="glass-panel" style="border-color: var(--danger); margin-bottom: 2rem; display: none;">
+                <h3 style="color: var(--danger);">Election Closed</h3>
+                <p>Voting is currently closed. You cannot cast a vote at this time.</p>
+            </div>
+            
+            <div id="alreadyVotedMsg" class="glass-panel" style="border-color: var(--success); margin-bottom: 2rem; display: none;">
+                <h3 style="color: var(--success);">Vote Already Cast</h3>
+                <p>Your vote has been securely recorded on the blockchain.</p>
+            </div>
+
+            <div id="votingArea">
+                <p style="color: var(--text-muted); margin-bottom: 2rem;">Select your preferred candidate. Your vote will be permanently recorded in the simulated blockchain.</p>
+                <div id="candidatesList"></div>
+                <div style="text-align: right; margin-top: 2rem;">
+                    <button id="voteBtn" class="btn btn-primary" style="padding: 1rem 3rem;" disabled>Submit Vote</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmModal" class="modal">
+        <div class="glass-panel modal-content slide-up">
+            <h2 style="margin-bottom: 1.5rem;">Confirm your vote?</h2>
+            <p>Candidate: <strong id="confirmCandidateName" style="color:var(--primary); font-size:1.2rem;"></strong></p>
+            <div style="margin: 2rem 0; padding: 1rem; border: 1px solid var(--danger); border-radius: 8px; color: var(--danger);">
+                ⚠ WARNING: Once submitted, your vote cannot be changed.
+            </div>
+            <div style="display: flex; gap: 1rem; justify-content: center;">
+                <button onclick="closeModal()" class="btn btn-outline">Cancel</button>
+                <button onclick="executeVote()" class="btn btn-primary">Confirm Vote</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="modal">
+        <div class="glass-panel modal-content slide-up" style="border-color: var(--success);">
+            <div class="success-animation">✓</div>
+            <h2 style="color: var(--success); margin-bottom: 1rem;">VOTE RECORDED</h2>
+            <p style="margin-bottom: 2rem;">Your vote has been securely added to the blockchain.</p>
+            
+            <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 8px; text-align: left; font-family: monospace; font-size: 0.9rem; margin-bottom: 2rem;">
+                <div style="color: var(--text-muted);">Transaction ID:</div>
+                <div id="txIdDisplay" style="color: var(--primary); word-break: break-all; margin-bottom: 1rem;"></div>
+                
+                <div style="color: var(--text-muted);">Block Hash:</div>
+                <div id="blockHashDisplay" style="word-break: break-all;"></div>
+            </div>
+            
+            <a href="dashboard.html" class="btn btn-primary">Return to Dashboard</a>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        const user = checkAuth('VOTER');
+        let selectedCandidate = null;
+
+        if (user) {
+            document.getElementById('userNameDisplay').textContent = user.name;
+            
+            if (!isElectionLive()) {
+                document.getElementById('votingArea').style.display = 'none';
+                document.getElementById('votingWarning').style.display = 'block';
+            } else if (user.hasVoted) {
+                document.getElementById('votingArea').style.display = 'none';
+                document.getElementById('alreadyVotedMsg').style.display = 'block';
+            } else {
+                loadCandidates();
+            }
+        }
+
+        function loadCandidates() {
+            const candidates = JSON.parse(localStorage.getItem('candidates'));
+            const container = document.getElementById('candidatesList');
+            
+            candidates.forEach(c => {
+                const div = document.createElement('div');
+                div.className = 'glass-panel candidate-card';
+                div.onclick = () => selectCandidate(c, div);
+                
+                div.innerHTML = `
+                    <div style="display: flex; align-items: center;">
+                        <div class="candidate-symbol">${c.symbol}</div>
+                        <div>
+                            <h3 style="margin-bottom: 0.3rem;">${c.name}</h3>
+                            <div style="color: var(--text-muted); font-size: 0.9rem;">${c.party}</div>
+                        </div>
+                    </div>
+                    <div style="width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center;" class="radio-btn">
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function selectCandidate(c, el) {
+            selectedCandidate = c;
+            
+            // UI Update
+            document.querySelectorAll('.candidate-card').forEach(card => {
+                card.classList.remove('selected');
+                card.querySelector('.radio-btn').style.background = 'transparent';
+                card.querySelector('.radio-btn').style.borderColor = 'var(--border)';
+            });
+            
+            el.classList.add('selected');
+            el.querySelector('.radio-btn').style.background = 'var(--primary)';
+            el.querySelector('.radio-btn').style.borderColor = 'var(--primary)';
+            
+            document.getElementById('voteBtn').disabled = false;
+        }
+
+        document.getElementById('voteBtn').addEventListener('click', () => {
+            if (selectedCandidate) {
+                document.getElementById('confirmCandidateName').textContent = selectedCandidate.name + ' (' + selectedCandidate.party + ')';
+                document.getElementById('confirmModal').style.display = 'flex';
+            }
+        });
+
+        function closeModal() {
+            document.getElementById('confirmModal').style.display = 'none';
+        }
+
+        function executeVote() {
+            const res = castVote(user.id, selectedCandidate.id);
+            if (res.success) {
+                document.getElementById('confirmModal').style.display = 'none';
+                
+                document.getElementById('txIdDisplay').textContent = res.txId;
+                document.getElementById('blockHashDisplay').textContent = res.block.hash;
+                
+                document.getElementById('successModal').style.display = 'flex';
+            } else {
+                alert(res.message);
+                window.location.reload();
+            }
+        }
+    </script>
+</body>
+</html>

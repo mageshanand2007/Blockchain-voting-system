@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ChainVote - Voter Login</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .login-container {
+            max-width: 450px;
+            margin: 4rem auto;
+        }
+        .error-msg {
+            color: var(--danger);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            display: none;
+        }
+        .demo-credentials {
+            margin-top: 2rem;
+            padding: 1rem;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="logo">
+            <span class="logo-icon">⬡</span> CHAINVOTE
+        </div>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="login-container glass-panel fade-in">
+            <h2 style="margin-bottom: 2rem; text-align: center;">Secure <span class="text-gradient">Login</span></h2>
+            
+            <div id="errorMsg" class="error-msg"></div>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <label>Voter ID</label>
+                    <input type="text" id="voterId" class="form-control" required placeholder="e.g. VOTER001">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="password" class="form-control" required placeholder="Enter your password">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Authenticate Identity</button>
+            </form>
+
+            <div class="demo-credentials">
+                <strong>DEMO CREDENTIALS:</strong><br>
+                Voter: VOTER001, VOTER002, VOTER003 | Pass: password<br><br>
+                Admin (use <a href="admin.html" style="color:var(--primary);text-decoration:underline;">Admin Portal</a>): admin | admin123
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const id = document.getElementById('voterId').value;
+            const pwd = document.getElementById('password').value;
+            
+            const res = login(id, pwd);
+            if (res.success) {
+                if (res.user.role === 'ADMIN') {
+                    window.location.href = 'admin.html';
+                } else {
+                    window.location.href = 'dashboard.html';
+                }
+            } else {
+                const msg = document.getElementById('errorMsg');
+                msg.textContent = res.message;
+                msg.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>

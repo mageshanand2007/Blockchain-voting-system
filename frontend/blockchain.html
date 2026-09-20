@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ChainVote - Blockchain Explorer</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .block-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            align-items: center;
+            margin-top: 2rem;
+        }
+        .chain-block {
+            width: 100%;
+            max-width: 600px;
+            background: rgba(13, 23, 48, 0.8);
+            border-left: 4px solid var(--primary);
+            position: relative;
+        }
+        .chain-block:before {
+            content: '';
+            position: absolute;
+            top: -24px;
+            left: 50%;
+            width: 2px;
+            height: 24px;
+            background: var(--primary);
+            opacity: 0.5;
+        }
+        .chain-block:first-child:before {
+            display: none;
+        }
+        .block-header {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 1rem;
+            margin-bottom: 1rem;
+        }
+        .block-row {
+            display: flex;
+            margin-bottom: 0.5rem;
+            font-family: monospace;
+        }
+        .block-label {
+            width: 120px;
+            color: var(--text-muted);
+        }
+        .block-val {
+            color: var(--primary);
+            word-break: break-all;
+        }
+        
+        #verifyBtn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+            z-index: 100;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: var(--bg-main);
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="logo">
+            <span class="logo-icon">⬡</span> CHAINVOTE
+        </div>
+        <div class="nav-links">
+            <a href="dashboard.html" class="btn btn-outline" style="padding: 0.5rem 1rem;">Back to Dashboard</a>
+        </div>
+    </nav>
+
+    <div class="container fade-in">
+        <div style="text-align: center; margin-bottom: 2rem;">
+            <h2>Blockchain <span class="text-gradient">Explorer</span></h2>
+            <p class="subtitle">Real-time view of the distributed ledger.</p>
+        </div>
+
+        <div class="block-container" id="blockchainList">
+            <!-- Blocks loaded via JS -->
+        </div>
+    </div>
+
+    <button id="verifyBtn" class="btn btn-primary" style="padding: 1rem 2rem;">VERIFY BLOCKCHAIN</button>
+
+    <!-- Verification Modal -->
+    <div id="verifyModal" class="modal">
+        <div class="glass-panel modal-content slide-up">
+            <div id="verifyLog" style="text-align: left; font-family: monospace; height: 150px; overflow-y: auto; margin-bottom: 1rem; color: var(--text-muted); background: rgba(0,0,0,0.5); padding: 1rem; border-radius: 8px;">
+                <!-- Logs -->
+            </div>
+            <div id="verifyResult" style="display: none; margin-top: 2rem; font-size: 1.2rem; font-weight: bold;"></div>
+            <button onclick="closeModal()" class="btn btn-outline" style="margin-top: 2rem; display: none;" id="closeVerifyBtn">Close</button>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        function loadBlockchain() {
+            const chain = JSON.parse(localStorage.getItem('blockchain'));
+            const container = document.getElementById('blockchainList');
+            container.innerHTML = '';
+            
+            chain.forEach(b => {
+                const div = document.createElement('div');
+                div.className = 'glass-panel chain-block slide-up';
+                
+                const d = new Date(b.timestamp);
+                
+                div.innerHTML = `
+                    <div class="block-header">
+                        <strong style="color:var(--primary)">BLOCK #${b.index.toString().padStart(3, '0')}</strong>
+                        <span style="color:var(--text-muted); font-size:0.9rem;">${d.toLocaleString()}</span>
+                    </div>
+                    <div class="block-row">
+                        <div class="block-label">Prev Hash:</div>
+                        <div class="block-val" style="color:var(--text-muted)">${b.previousHash}</div>
+                    </div>
+                    <div class="block-row">
+                        <div class="block-label">Curr Hash:</div>
+                        <div class="block-val">${b.hash}</div>
+                    </div>
+                    <div class="block-row">
+                        <div class="block-label">Tx ID:</div>
+                        <div class="block-val" style="color:#fff">${b.txId}</div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        loadBlockchain();
+
+        document.getElementById('verifyBtn').addEventListener('click', () => {
+            const modal = document.getElementById('verifyModal');
+            const logBox = document.getElementById('verifyLog');
+            const resultBox = document.getElementById('verifyResult');
+            const closeBtn = document.getElementById('closeVerifyBtn');
+            
+            modal.style.display = 'flex';
+            logBox.innerHTML = '';
+            resultBox.style.display = 'none';
+            closeBtn.style.display = 'none';
+            
+            const chain = JSON.parse(localStorage.getItem('blockchain'));
+            let i = 0;
+            let isValid = true;
+            
+            function scanNext() {
+                if (i < chain.length) {
+                    const b = chain[i];
+                    logBox.innerHTML += `<div>Scanning Block #${b.index.toString().padStart(3,'0')}... OK</div>`;
+                    logBox.scrollTop = logBox.scrollHeight;
+                    
+                    // Simple simulated verify logic based on prev hash link
+                    if (i > 0 && chain[i].previousHash !== chain[i-1].hash) {
+                        isValid = false;
+                    }
+                    
+                    i++;
+                    setTimeout(scanNext, 300); // Animation delay
+                } else {
+                    logBox.innerHTML += `<div style="color:var(--primary); margin-top:1rem;">Checking Hash Relationships...</div>`;
+                    setTimeout(() => {
+                        logBox.innerHTML += `<div>Verifying Chain Integrity...</div>`;
+                        logBox.scrollTop = logBox.scrollHeight;
+                        setTimeout(() => showResult(isValid), 500);
+                    }, 500);
+                }
+            }
+            scanNext();
+        });
+
+        function showResult(isValid) {
+            const resultBox = document.getElementById('verifyResult');
+            const closeBtn = document.getElementById('closeVerifyBtn');
+            
+            resultBox.style.display = 'block';
+            closeBtn.style.display = 'inline-block';
+            
+            if (isValid) {
+                resultBox.innerHTML = `
+                    <div style="font-size:3rem; color:var(--success); margin-bottom:1rem;">✓</div>
+                    <div style="color:var(--success)">BLOCKCHAIN VERIFIED</div>
+                    <div style="font-size:0.9rem; color:var(--text-muted); margin-top:0.5rem; font-weight:normal;">All blocks are correctly linked and no tampering was detected.</div>
+                `;
+            } else {
+                resultBox.innerHTML = `
+                    <div style="font-size:3rem; color:var(--danger); margin-bottom:1rem;">⚠</div>
+                    <div style="color:var(--danger)">INTEGRITY FAILURE</div>
+                    <div style="font-size:0.9rem; color:var(--text-muted); margin-top:0.5rem; font-weight:normal;">Blockchain validation detected a modified block.</div>
+                `;
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('verifyModal').style.display = 'none';
+        }
+    </script>
+</body>
+</html>

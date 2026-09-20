@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChainVote - Blockchain E-Voting System</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .hero {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            min-height: 80vh;
+        }
+        .hero-content h1 {
+            font-size: 3.5rem;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+        }
+        .hero-buttons {
+            margin-top: 2rem;
+            display: flex;
+            gap: 1rem;
+        }
+        .security-cards {
+            grid-template-columns: repeat(3, 1fr);
+            margin-top: 4rem;
+            margin-bottom: 4rem;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="logo">
+            <span class="logo-icon">⬡</span> CHAINVOTE
+        </div>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="#security">Security</a>
+            <a href="candidates.html">Candidates</a>
+            <a href="login.html" class="btn btn-outline" style="padding: 0.5rem 1rem;">Voter Login</a>
+            <a href="admin.html" class="btn btn-outline" style="padding: 0.5rem 1rem;">Admin Portal</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <section class="hero slide-up">
+            <div class="hero-content">
+                <h1>Your Vote.<br>Your Voice.<br><span class="text-gradient">Secured by Blockchain.</span></h1>
+                <p class="subtitle">An educational blockchain-powered electronic voting system designed to demonstrate transparent, tamper-evident digital elections.</p>
+                <div class="hero-buttons">
+                    <a href="login.html" class="btn btn-primary">Cast Your Vote</a>
+                    <a href="blockchain.html" class="btn btn-outline">Explore Blockchain</a>
+                </div>
+            </div>
+            
+            <div class="hero-visual fade-in">
+                <div class="blockchain-visual" style="flex-direction: column; gap: 0.5rem;">
+                    <div class="node">
+                        <div class="node-header">BLOCK #001 (GENESIS)</div>
+                        <div>Prev: <span class="hash-text">0000000000</span></div>
+                        <div>Hash: <span class="hash-text">a8f9c1...</span></div>
+                    </div>
+                    <div class="node-link">↓</div>
+                    <div class="node">
+                        <div class="node-header">BLOCK #002</div>
+                        <div>Prev: <span class="hash-text">a8f9c1...</span></div>
+                        <div>Hash: <span class="hash-text">b72e4d...</span></div>
+                    </div>
+                    <div class="node-link">↓</div>
+                    <div class="node" style="box-shadow: 0 0 20px var(--primary);">
+                        <div class="node-header">BLOCK #003</div>
+                        <div>Prev: <span class="hash-text">b72e4d...</span></div>
+                        <div>Hash: <span class="hash-text">Computing...</span></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="security" class="slide-up" style="animation-delay: 0.2s;">
+            <h2 style="text-align: center; margin-bottom: 1rem; font-size: 2.5rem;">Cryptographic <span class="text-gradient">Security</span></h2>
+            <p class="subtitle" style="text-align: center; max-width: 600px; margin: 0 auto;">Our system leverages core blockchain concepts to ensure vote integrity and prevent tampering.</p>
+            
+            <div class="grid security-cards">
+                <div class="glass-panel">
+                    <h3 style="color: var(--primary); margin-bottom: 1rem;">Immutable Records</h3>
+                    <p class="subtitle" style="font-size: 0.95rem;">Votes are represented as blockchain blocks. Once a block is added, the data inside cannot be altered without invalidating the entire chain.</p>
+                </div>
+                <div class="glass-panel">
+                    <h3 style="color: var(--primary); margin-bottom: 1rem;">SHA-256 Hashing</h3>
+                    <p class="subtitle" style="font-size: 0.95rem;">Every block's integrity is protected using SHA-256 cryptographic hashing, ensuring data authenticity.</p>
+                </div>
+                <div class="glass-panel">
+                    <h3 style="color: var(--primary); margin-bottom: 1rem;">Double Vote Prevention</h3>
+                    <p class="subtitle" style="font-size: 0.95rem;">Strict voter authentication combined with a distributed ledger concept prevents any voter from casting more than one vote.</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
