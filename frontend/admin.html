@@ -4,119 +4,77 @@
     <meta charset="UTF-8">
     <title>ChainVote - Admin Portal</title>
     <link rel="stylesheet" href="css/style.css">
-    <style>
-        .admin-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-        .stat-card { text-align: center; }
-        .stat-val { font-size: 2rem; font-weight: bold; color: var(--primary); margin-top: 1rem; }
-        .admin-controls {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
-        }
-        .live-indicator {
-            display: inline-block;
-            padding: 0.25rem 0.75rem;
-            border-radius: 12px;
-            font-size: 0.8rem;
-            font-weight: bold;
-        }
-        .indicator-live { background: rgba(0,230,118,0.2); color: var(--success); border: 1px solid var(--success); }
-        .indicator-closed { background: rgba(255,61,0,0.2); color: var(--danger); border: 1px solid var(--danger); }
-        
-        /* Modal for tampering demo */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.8);
-            backdrop-filter: blur(5px);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-        .modal-content { background: var(--bg-main); width: 100%; max-width: 400px; padding: 2rem; border-radius: 12px; border: 1px solid var(--border); }
-    </style>
 </head>
 <body>
     <nav>
         <div class="logo">
-            <span class="logo-icon">⬡</span> ADMIN CONTROL
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="logo-icon"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+            <span style="color: var(--text-main);">CHAINVOTE <span style="color: var(--danger); font-size: 0.8em; margin-left: 0.5rem; border: 1px solid var(--danger); padding: 0.1rem 0.5rem; border-radius: 4px; vertical-align: middle;">ADMIN</span></span>
         </div>
         <div class="nav-links">
-            <a href="blockchain.html">Blockchain Explorer</a>
-            <a href="results.html">Live Results</a>
-            <a href="#" onclick="logout()" class="btn btn-outline" style="padding: 0.5rem 1rem;">Logout</a>
+            <a href="results.html">View Results</a>
+            <a href="#" onclick="logout()" class="btn btn-outline" style="border-color: var(--danger); color: var(--danger); padding: 0.5rem 1rem;">Logout Admin</a>
         </div>
     </nav>
 
     <div class="container fade-in">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-            <h2>Election Dashboard</h2>
-            <div id="statusBadge" class="live-indicator indicator-closed">CLOSED</div>
+        <h2 style="margin-bottom: 2rem; font-size: 2.2rem;">Election <span class="text-gradient">Control Center</span></h2>
+        
+        <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-bottom: 2rem;">
+            <div class="glass-panel" style="text-align: center;">
+                <h3 style="color: var(--text-muted); font-size: 0.9rem; text-transform: uppercase;">Election Status</h3>
+                <div id="statusBadge" class="status-badge" style="margin-top: 1rem; font-size: 1rem;"></div>
+            </div>
+            
+            <div class="glass-panel" style="text-align: center;">
+                <h3 style="color: var(--text-muted); font-size: 0.9rem; text-transform: uppercase;">Total Candidates</h3>
+                <p id="totalCandidates" style="font-size: 2.5rem; font-weight: 700; color: #fff; margin-top: 0.5rem;">0</p>
+            </div>
+            <div class="glass-panel" style="text-align: center;">
+                <h3 style="color: var(--text-muted); font-size: 0.9rem; text-transform: uppercase;">Total Voters</h3>
+                <p id="totalVoters" style="font-size: 2.5rem; font-weight: 700; color: #fff; margin-top: 0.5rem;">0</p>
+            </div>
+            <div class="glass-panel" style="text-align: center;">
+                <h3 style="color: var(--text-muted); font-size: 0.9rem; text-transform: uppercase;">Votes Cast</h3>
+                <p id="votesCast" style="font-size: 2.5rem; font-weight: 700; color: var(--primary); margin-top: 0.5rem;">0</p>
+            </div>
+            <div class="glass-panel" style="text-align: center;">
+                <h3 style="color: var(--text-muted); font-size: 0.9rem; text-transform: uppercase;">Blocks Generated</h3>
+                <p id="totalBlocks" style="font-size: 2.5rem; font-weight: 700; color: var(--secondary); margin-top: 0.5rem;">0</p>
+            </div>
         </div>
 
-        <div class="admin-grid">
-            <div class="glass-panel stat-card">
-                <div style="color:var(--text-muted)">Total Voters</div>
-                <div class="stat-val" id="totalVoters">0</div>
-            </div>
-            <div class="glass-panel stat-card">
-                <div style="color:var(--text-muted)">Votes Cast</div>
-                <div class="stat-val" id="votesCast">0</div>
-            </div>
-            <div class="glass-panel stat-card">
-                <div style="color:var(--text-muted)">Candidates</div>
-                <div class="stat-val" id="totalCandidates">0</div>
-            </div>
-            <div class="glass-panel stat-card">
-                <div style="color:var(--text-muted)">Blockchain Blocks</div>
-                <div class="stat-val" id="totalBlocks">0</div>
-            </div>
-        </div>
+        <div id="controlMsg" style="margin-bottom: 2rem; padding: 1rem; border-radius: 8px; display: none;"></div>
 
-        <div class="admin-controls">
+        <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 2rem;">
             <div class="glass-panel">
-                <h3 style="margin-bottom: 1.5rem; color: var(--primary);">Election Control</h3>
-                
-                <div id="controlMsg" style="margin-bottom: 1.5rem; color: var(--text-muted);">
-                    Voting is currently closed.
-                </div>
-                
+                <h3 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg> Lifecycle Management</h3>
+                <p style="color: var(--text-muted); margin-bottom: 2rem;">Control the active state of the election. Only one election can be live at a time.</p>
                 <div style="display: flex; gap: 1rem;">
-                    <button id="startBtn" class="btn btn-primary" onclick="toggleElection(true)">START ELECTION</button>
-                    <button id="endBtn" class="btn btn-outline" style="color:var(--danger); border-color:var(--danger);" onclick="toggleElection(false)">END ELECTION</button>
+                    <button id="startBtn" onclick="toggleElection(true)" class="btn btn-primary" style="flex: 1; background: linear-gradient(135deg, #10b981 0%, #059669 100%); box-shadow: 0 4px 15px rgba(16,185,129,0.4);">Start Election</button>
+                    <button id="endBtn" onclick="toggleElection(false)" class="btn btn-danger" style="flex: 1;">End Election</button>
                 </div>
             </div>
-
-            <div class="glass-panel">
-                <h3 style="margin-bottom: 1.5rem; color: var(--primary);">System Tools</h3>
-                
-                <div style="display: flex; flex-direction: column; gap: 1rem;">
-                    <a href="results.html" class="btn btn-outline" style="text-align: center;">View Results Dashboard</a>
-                    <a href="blockchain.html" class="btn btn-outline" style="text-align: center;">Verify Blockchain</a>
-                    <button onclick="document.getElementById('tamperModal').style.display='flex'" class="btn btn-outline" style="border-color: #ff9800; color: #ff9800;">Simulate Tampering Attack</button>
-                </div>
+            
+            <div class="glass-panel" style="border-color: rgba(239, 68, 68, 0.3);">
+                <h3 style="margin-bottom: 1.5rem; color: var(--danger); display: flex; align-items: center; gap: 0.5rem;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg> Danger Zone</h3>
+                <p style="color: var(--text-muted); margin-bottom: 2rem;">Developer tools for demonstration purposes.</p>
+                <button onclick="document.getElementById('tamperModal').style.display='flex'" class="btn btn-outline" style="border-color: var(--danger); color: var(--danger); width: 100%;">Simulate Blockchain Tampering</button>
             </div>
         </div>
     </div>
 
     <!-- Tamper Modal -->
     <div id="tamperModal" class="modal">
-        <div class="modal-content slide-up">
-            <h3 style="color: #ff9800; margin-bottom: 1rem;">Simulate Attack</h3>
-            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">This will artificially modify a previous block's hash to demonstrate how the blockchain validation detects tampering.</p>
-            <div style="display: flex; gap: 1rem;">
-                <button onclick="document.getElementById('tamperModal').style.display='none'" class="btn btn-outline" style="flex:1;">Cancel</button>
-                <button onclick="tamperBlock()" class="btn btn-primary" style="flex:1; background: linear-gradient(135deg, #ff9800 0%, #ff5722 100%);">Modify Hash</button>
+        <div class="glass-panel modal-content slide-up" style="border-color: var(--danger);">
+            <h2 style="color: var(--danger); margin-bottom: 1rem;">Simulate Tampering</h2>
+            <p style="margin-bottom: 1.5rem; color: var(--text-muted);">This will modify a random block's data without recalculating hashes, effectively breaking the chain's integrity.</p>
+            <div style="display: flex; gap: 1rem; justify-content: center;">
+                <button onclick="document.getElementById('tamperModal').style.display='none'" class="btn btn-outline">Cancel</button>
+                <button onclick="tamperBlock()" class="btn btn-danger">Execute Tamper</button>
             </div>
         </div>
     </div>
-
     <script src="js/app.js"></script>
     <script>
         // Use standard auth checking, fallback to manual logic to not break if checkAuth redirects wrong
