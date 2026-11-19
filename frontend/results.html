@@ -4,88 +4,44 @@
     <meta charset="UTF-8">
     <title>ChainVote - Election Results</title>
     <link rel="stylesheet" href="css/style.css">
-    <style>
-        .results-container {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        .result-bar-wrapper {
-            margin-bottom: 2rem;
-        }
-        .result-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 0.5rem;
-            font-size: 1.1rem;
-        }
-        .bar-bg {
-            background: rgba(255,255,255,0.05);
-            height: 24px;
-            border-radius: 12px;
-            overflow: hidden;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-        .bar-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--secondary) 0%, var(--primary) 100%);
-            width: 0%;
-            transition: width 1.5s cubic-bezier(0.1, 0.8, 0.2, 1);
-            position: relative;
-        }
-        .bar-fill::after {
-            content: '';
-            position: absolute;
-            top: 0; right: 0; bottom: 0; left: 0;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
-            animation: shimmer 2s infinite;
-        }
-        @keyframes shimmer {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
-        }
-        .winner-crown {
-            color: #ffd700;
-            margin-left: 0.5rem;
-            display: none;
-        }
-    </style>
 </head>
 <body>
     <nav>
         <div class="logo">
-            <span class="logo-icon">⬡</span> CHAINVOTE
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="logo-icon"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+            CHAINVOTE <span style="font-size: 0.8em; margin-left: 0.5rem; color: var(--text-muted);">RESULTS</span>
         </div>
         <div class="nav-links">
-            <a href="admin.html" class="btn btn-outline" style="padding: 0.5rem 1rem;">Back to Admin</a>
+            <a href="index.html">Home</a>
+            <a href="admin.html" class="btn btn-outline" style="padding: 0.5rem 1rem;">Admin Back</a>
         </div>
     </nav>
 
-    <div class="container fade-in">
-        <div style="text-align: center; margin-bottom: 3rem;">
-            <h2>Live Election <span class="text-gradient">Results</span></h2>
-            <p class="subtitle" id="electionStatusText">Loading status...</p>
+    <div class="container fade-in" style="max-width: 900px;">
+        <h2 style="text-align: center; font-size: 2.5rem; margin-bottom: 1rem;">Official <span class="text-gradient">Tally</span></h2>
+        
+        <div id="electionStatusText" style="text-align: center; margin-bottom: 3rem; font-size: 1.2rem;"></div>
+        
+        <div class="grid" style="grid-template-columns: 1fr 1fr 1fr; margin-bottom: 3rem; text-align: center;">
+            <div class="glass-panel" style="padding: 1.5rem;">
+                <h3 style="color: var(--text-muted); font-size: 0.9rem; text-transform: uppercase;">Total Voters</h3>
+                <p id="resTotalVoters" style="font-size: 2.5rem; font-weight: 700; color: #fff;">0</p>
+            </div>
+            <div class="glass-panel" style="padding: 1.5rem;">
+                <h3 style="color: var(--text-muted); font-size: 0.9rem; text-transform: uppercase;">Votes Counted</h3>
+                <p id="resTotalVotes" style="font-size: 2.5rem; font-weight: 700; color: var(--primary);">0</p>
+            </div>
+            <div class="glass-panel" style="padding: 1.5rem;">
+                <h3 style="color: var(--text-muted); font-size: 0.9rem; text-transform: uppercase;">Participation</h3>
+                <p id="resParticipation" style="font-size: 2.5rem; font-weight: 700; color: var(--success);">0%</p>
+            </div>
         </div>
 
-        <div class="results-container glass-panel" id="resultsArea">
-            <!-- Results injected here -->
-        </div>
-        
-        <div class="grid" style="grid-template-columns: repeat(3, 1fr); margin-top: 2rem; max-width: 800px; margin-left: auto; margin-right: auto;">
-            <div class="glass-panel" style="text-align: center; padding: 1rem;">
-                <div style="color:var(--text-muted)">Total Voters</div>
-                <div id="resTotalVoters" style="font-size:1.5rem; font-weight:bold; color:var(--primary)">0</div>
-            </div>
-            <div class="glass-panel" style="text-align: center; padding: 1rem;">
-                <div style="color:var(--text-muted)">Total Votes</div>
-                <div id="resTotalVotes" style="font-size:1.5rem; font-weight:bold; color:var(--primary)">0</div>
-            </div>
-            <div class="glass-panel" style="text-align: center; padding: 1rem;">
-                <div style="color:var(--text-muted)">Participation</div>
-                <div id="resParticipation" style="font-size:1.5rem; font-weight:bold; color:var(--primary)">0%</div>
-            </div>
+        <div id="resultsArea" class="glass-panel">
+            <h3 style="margin-bottom: 2rem; color: var(--primary);">Candidate Standings</h3>
+            <!-- Results will be loaded here -->
         </div>
     </div>
-
     <script src="js/app.js"></script>
     <script>
         function loadResults() {

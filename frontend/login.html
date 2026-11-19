@@ -5,30 +5,16 @@
     <title>ChainVote - Voter Login</title>
     <link rel="stylesheet" href="css/style.css">
     <style>
-        .login-container {
-            max-width: 450px;
-            margin: 4rem auto;
-        }
-        .error-msg {
-            color: var(--danger);
-            font-size: 0.9rem;
-            margin-bottom: 1rem;
-            display: none;
-        }
-        .demo-credentials {
-            margin-top: 2rem;
-            padding: 1rem;
-            background: rgba(255,255,255,0.05);
-            border-radius: 8px;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-        }
+        .login-container { max-width: 450px; margin: 4rem auto; }
+        .error-msg { color: var(--danger); font-size: 0.9rem; margin-bottom: 1rem; display: none; background: rgba(239,68,68,0.1); padding: 0.75rem; border-radius: 6px; border: 1px solid rgba(239,68,68,0.3); }
+        .demo-credentials { margin-top: 2rem; padding: 1.5rem; background: rgba(255,255,255,0.03); border-radius: 8px; font-size: 0.85rem; color: var(--text-muted); border: 1px dashed rgba(255,255,255,0.1); }
     </style>
 </head>
 <body>
     <nav>
         <div class="logo">
-            <span class="logo-icon">⬡</span> CHAINVOTE
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="logo-icon"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+            CHAINVOTE
         </div>
         <div class="nav-links">
             <a href="index.html">Home</a>
@@ -37,7 +23,7 @@
 
     <div class="container">
         <div class="login-container glass-panel fade-in">
-            <h2 style="margin-bottom: 2rem; text-align: center;">Secure <span class="text-gradient">Login</span></h2>
+            <h2 style="margin-bottom: 2rem; text-align: center; font-size: 2rem;">Secure <span class="text-gradient">Login</span></h2>
             
             <div id="errorMsg" class="error-msg"></div>
 
@@ -50,17 +36,16 @@
                     <label>Password</label>
                     <input type="password" id="password" class="form-control" required placeholder="Enter your password">
                 </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Authenticate Identity</button>
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem; padding: 1rem;">Authenticate Identity</button>
             </form>
 
             <div class="demo-credentials">
-                <strong>DEMO CREDENTIALS:</strong><br>
-                Voter: VOTER001, VOTER002, VOTER003 | Pass: password<br><br>
+                <strong style="color: #fff; display: block; margin-bottom: 0.5rem;">DEMO CREDENTIALS:</strong>
+                Voter: <span style="color:var(--primary);">VOTER001</span>, <span style="color:var(--primary);">VOTER002</span>, <span style="color:var(--primary);">VOTER003</span> | Pass: password<br><br>
                 Admin (use <a href="admin.html" style="color:var(--primary);text-decoration:underline;">Admin Portal</a>): admin | admin123
             </div>
         </div>
     </div>
-
     <script src="js/app.js"></script>
     <script>
         document.getElementById('loginForm').addEventListener('submit', (e) => {
